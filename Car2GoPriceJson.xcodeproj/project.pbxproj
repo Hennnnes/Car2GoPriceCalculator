@@ -481,6 +481,7 @@
 				C3FE0A9D1B91F4D500A1279A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C3FE0A9E1B91F4D500A1279A /* Build configuration list for PBXNativeTarget "Car2GoPriceJsonTests" */ = {
 			isa = XCConfigurationList;
@@ -489,6 +490,7 @@
 				C3FE0AA01B91F4D500A1279A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		C3FE0AA11B91F4D500A1279A /* Build configuration list for PBXNativeTarget "Car2GoPriceJsonUITests" */ = {
 			isa = XCConfigurationList;
@@ -497,6 +499,7 @@
 				C3FE0AA31B91F4D500A1279A /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
