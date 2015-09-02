@@ -7,12 +7,17 @@
 //
 
 import UIKit
+import CoreLocation
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CLLocationManagerDelegate {
 
     var price: Double = 0.00
     var durationMinutes: Int = 0
     var durationHours: Int = 0
+    var originValue: String = "test"
+    var destinationValue: String = ""
+    let locationManager = CLLocationManager()
+    var originAdress: String = ""
     
     @IBOutlet weak var originTextField: UITextField!
     @IBOutlet weak var destinationTextField: UITextField!
@@ -30,13 +35,60 @@ class ViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
+    /*
+        Location Stuff happens here
+    */
+    @IBAction func getLocation(sender: AnyObject) {
+        // For foreground user
+        self.locationManager.requestWhenInUseAuthorization()
+        
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.delegate = self
+            locationManager.desiredAccuracy = kCLLocationAccuracyNearestTenMeters
+            locationManager.requestWhenInUseAuthorization()
+            locationManager.startUpdatingLocation()
+            locationManager.stopUpdatingLocation()
+        }
+
+    }
+
+    func locationManager(manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        let locValue:CLLocationCoordinate2D = manager.location!.coordinate
+        
+        print("locations = \(locValue.latitude) \(locValue.longitude)")
+        originValue = "\(locValue.latitude),\(locValue.longitude)"
+        print(originValue)
+        let originURL = "https://maps.googleapis.com/maps/api/geocode/json?address=\(originValue)"
+        let url = NSURL(string: originURL)
+        let data = NSData(contentsOfURL: url!)
+        do {
+            let jsonResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary
+            let jsonString = jsonResult?.description
+            var jsonSubString1 = jsonString!.componentsSeparatedByString("\"formatted_address\" = \"")
+            let jsonSubString2 = jsonSubString1[1].componentsSeparatedByString(",")
+            let jsonSubString3 = jsonSubString2[0].componentsSeparatedByString("\n")
+            originTextField.text = "\(jsonSubString3[0])"
+        } catch let error as NSError {
+            print(error)
+        }
+        
+        
+    }
+    
+    func locationManager(manager: CLLocationManager, didFailWithError error: NSError) {
+        print("failed")
+    }
+    /*
+        Location stuff over
+    */
+    
     
     func extractJson(InputUrl: String){
-        var url = NSURL(string: InputUrl)
-        var data = NSData(contentsOfURL: url!)
+        let url = NSURL(string: InputUrl)
+        let data = NSData(contentsOfURL: url!)
         do {
-            var jsonResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary
-            var jsonString = jsonResult?.description
+            let jsonResult = try NSJSONSerialization.JSONObjectWithData(data!, options: NSJSONReadingOptions.MutableContainers) as? NSDictionary
+            let jsonString = jsonResult?.description
             var jsonSubString1 = jsonString!.componentsSeparatedByString("duration")
             var jsonSubString2 = jsonSubString1[1].componentsSeparatedByString("}")
             var jsonSubString3 = jsonSubString2[0].componentsSeparatedByString("=")
@@ -57,11 +109,14 @@ class ViewController: UIViewController {
     
     
     @IBAction func getDurationAndPrice(sender: AnyObject) {
-        var originValue = originTextField.text!.stringByReplacingOccurrencesOfString(", ", withString: "+").stringByReplacingOccurrencesOfString(" ", withString: "+")
+        if (originValue == "test") {
+         originValue = originTextField.text!.stringByReplacingOccurrencesOfString(", ", withString: "+").stringByReplacingOccurrencesOfString(" ", withString: "+")
+         originValue = "\(originValue)+DE"
+        }
         print("origin Value: \(originValue)")
-        var destinationValue = destinationTextField.text!.stringByReplacingOccurrencesOfString(" ", withString: "+").stringByReplacingOccurrencesOfString(", ", withString: "+")
+        destinationValue = destinationTextField.text!.stringByReplacingOccurrencesOfString(" ", withString: "+").stringByReplacingOccurrencesOfString(", ", withString: "+")
         print("destination value: \(destinationValue)")
-        var url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=\(originValue)+DE&destinations=\(destinationValue)+DE&mode=driving"
+        let url = "https://maps.googleapis.com/maps/api/distancematrix/json?origins=\(originValue)&destinations=\(destinationValue)+DE&mode=driving"
         print(url)
         extractJson(url)
         
