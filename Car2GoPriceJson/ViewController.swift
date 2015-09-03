@@ -28,6 +28,12 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
+        let tap: UITapGestureRecognizer = UITapGestureRecognizer(target: self, action: "DismissKeyboard")
+        view.addGestureRecognizer(tap)
+    }
+    func DismissKeyboard(){
+        //Causes the view (or one of its embedded text fields) to resign the first responder status.
+        view.endEditing(true)
     }
 
     override func didReceiveMemoryWarning() {
@@ -109,10 +115,10 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
     
     
     @IBAction func getDurationAndPrice(sender: AnyObject) {
-        if (originValue == "test") {
+        
          originValue = originTextField.text!.stringByReplacingOccurrencesOfString(", ", withString: "+").stringByReplacingOccurrencesOfString(" ", withString: "+")
          originValue = "\(originValue)+DE"
-        }
+        
         print("origin Value: \(originValue)")
         destinationValue = destinationTextField.text!.stringByReplacingOccurrencesOfString(" ", withString: "+").stringByReplacingOccurrencesOfString(", ", withString: "+")
         print("destination value: \(destinationValue)")
@@ -127,7 +133,7 @@ class ViewController: UIViewController, CLLocationManagerDelegate {
         }
         price = Double(durationMinutes) * 0.29 + Double(durationHours)*14.90
         priceLabel.text = "\(price) €"
-        
+        DismissKeyboard()
     }
 
  
